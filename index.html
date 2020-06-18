@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mini Fórum</title>
+    <link rel="stylesheet" href="estilo.css">
+    <meta charset="UTF-8">
+    <meta name="description" content="Projeto Final - Programação para Web">
+    <meta name="author" content="Pedro Citadin Coelho e José Luiz Honorato">
+    <link rel="icon"
+        href="https://w7.pngwing.com/pngs/157/153/png-transparent-facebook-logo-facebook-waikato-racing-club-inc-social-media-share-icon-icon-f-icon-blue-camera-icon-phone-icon-thumbnail.png"
+        type="image/x-icon">
+</head>
+
+<body>
+
+    <header>
+        <h1>Mini Fórum</h1>
+    </header>
+
+    <main>
+        <div id="inseridora">
+            <h3>Inserir um tópico</h3>
+            <form id="pegaTopico">
+                <input type="text" id="titulo" placeholder="Título"><br>
+                <br>
+                <input type="text" id="autor" placeholder="Autor"><br>
+                <br>
+                <textarea id="conteudo" placeholder="Descreva o tópico"></textarea>
+                <br>
+                <br>
+                <button type="button" id="botSalvar" value="TESTE">Publicar Tópico</button>
+            </form>
+            
+
+
+        </div>
+        <div id="topicos">
+            <section id="lista">
+
+            </section>
+
+        </div>
+    </main>
+
+
+
+</body>
+<script>
+    const url = 'https://exercicio-ppw.herokuapp.com/api/1102591'
+    const formulario = document.querySelector("#pegaTopico")
+    const botaoSalvar = document.querySelector("#botSalvar")
+
+    function listaTopicos() {
+
+        lista.textContent = "Carregando..."
+
+        var requisicao = fetch(url)
+        var resposta = requisicao.then(function (resposta) {
+            return resposta.json()
+            
+        })
+        resposta.then(function (dados) {
+            lista.textContent = ""
+            for (var i = 0; i < dados.length; i++) {
+                console.log(dados[i])
+                var d = document.createElement('input')
+                d.type = "button"
+                d.value = i
+                
+                var usu = document.createElement('input')
+                usu.type = "text"
+                var come = document.createElement('input')
+                come.type = "text"
+                var p = document.createElement('p')
+                var b = document.createElement('p')
+                var c = document.createElement('hr')
+                var jj = document.createElement('p')
+                jj.textContent = "-------------------------"
+                var sub = document.createElement('h3')
+                sub.textContent = "comentarios"
+
+                d.textContent = "Salvar comentário"
+                d.addEventListener('click', function () {
+                    inserirComentario(d.value, come, usu)
+                })
+                p.textContent = "Titulo: " + dados[i].titulo
+                b.textContent = "Assunto: " + dados[i].assunto
+
+                lista.appendChild(p)
+                lista.appendChild(b)
+                
+                lista.appendChild(sub)
+               if(dados[i].comentarios!=null){
+                for (var j = 0; j < dados[i].comentarios.length; j++) {
+                    
+                    var us = document.createElement('p')
+                    us.textContent = "Usuario: " + dados[i].comentarios[j].usuario
+                    var co = document.createElement('p')
+                    co.textContent = "Comentário: " + dados[i].comentarios[j].comentario
+                    lista.appendChild(jj)
+                    lista.appendChild(us)
+                    lista.appendChild(co)
+
+                }
+            }
+                lista.appendChild(usu)
+                lista.appendChild(come)
+                lista.appendChild(d)
+                lista.appendChild(c)
+            }
+        })
+    }
+   
+    function salvaTopico(event) {
+
+        event.preventDefault()
+        
+
+        var topico = {
+            titulo: formulario.querySelector("#titulo").value,
+            assunto: formulario.querySelector("#conteudo").value,
+            autor: formulario.querySelector("#autor").value,   
+           
+        }
+        var opcoes = {
+            method: 'Post',
+            body: JSON.stringify(topico),
+            headers: {
+                'content-type': 'application/json'
+            }
+        }
+        var requisicao = fetch(url, opcoes)
+        var resposta = requisicao.then(function (resposta) {
+            return resposta.json()
+        })
+        resposta.then(function (dados) {
+            
+            listaTopicos()
+
+        })
+    }
+    function deletarTudo() {
+        var opcoes = {
+            method: 'DELETE',
+        }
+        var requisicao = fetch(url, opcoes)
+        var resposta = requisicao.then(function (resposta) {
+            return resposta.json()
+        })
+        resposta.then(function (dados) {
+            console.log(dados)
+            listaTopicos()
+
+        })
+    }
+    
+    
+    //deletarTudo() 
+    listaTopicos()
+    botaoSalvar.addEventListener('click', salvaTopico)
+
+</script>
+
+</html>
